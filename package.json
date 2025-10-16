@@ -27,7 +27,7 @@
     "dongcai",
     "tonghuashun"
   ],
-  "author": "Your Name <guangxiangdebizi@gmail.com>",
+  "author": "Xingyu Chen <guangxiangdebizi@gmail.com>",
   "license": "Apache-2.0",
   "dependencies": {
     "@modelcontextprotocol/sdk": "0.6.0",
