@@ -1,0 +1,46 @@
+{
+  "name": "financemcp-dcths",
+  "version": "1.0.0",
+  "description": "MCP Server for Financial Data - Supports DongCai and TongHuaShun data sources via Tushare API",
+  "type": "module",
+  "bin": {
+    "financemcp-dcths": "./build/index.js",
+    "financemcp-dcths-http": "./build/httpServer.js"
+  },
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755'); try{require('fs').chmodSync('build/httpServer.js','755')}catch(e){}\"",
+    "prepare": "npm run build",
+    "watch": "tsc --watch",
+    "dev": "node build/httpServer.js",
+    "start:stdio": "node build/index.js",
+    "start:http": "node build/httpServer.js"
+  },
+  "keywords": [
+    "mcp",
+    "finance",
+    "tushare",
+    "stock",
+    "moneyflow",
+    "dongcai",
+    "tonghuashun"
+  ],
+  "author": "Your Name <guangxiangdebizi@gmail.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "0.6.0",
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17",
+    "typescript": "^5.3.3"
+  }
+}
+

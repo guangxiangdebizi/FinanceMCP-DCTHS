@@ -1,0 +1,7 @@
+帮我把@https://tushare.pro/document/2?doc_id=261 
+@https://tushare.pro/document/2?doc_id=259 
+@https://tushare.pro/document/2?doc_id=260 
+@https://tushare.pro/document/2?doc_id=362 
+@https://tushare.pro/document/2?doc_id=363 
+@https://tushare.pro/document/2?doc_id=382 
+然后我的想法是你创建一下对应的三个工具，然后东财和同花顺作为每个工具的必选参数之一，这样就可以根据这个来选用哪个的数据了，懂我意思吗
