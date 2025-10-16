@@ -7,9 +7,12 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { CallToolRequestSchema, ListToolsRequestSchema, CallToolResult, Tool } from "@modelcontextprotocol/sdk/types.js";
 
 // 导入业务工具
-import { moneyflow } from "./tools/moneyflow.js";
-import { blockMoneyflow } from "./tools/blockMoneyflow.js";
-import { blockMember } from "./tools/blockMember.js";
+import { thsIndex } from "./tools/thsIndex.js";
+import { thsDaily } from "./tools/thsDaily.js";
+import { thsMember } from "./tools/thsMember.js";
+import { dcIndex } from "./tools/dcIndex.js";
+import { dcMember } from "./tools/dcMember.js";
+import { dcDaily } from "./tools/dcDaily.js";
 
 // 会话存储（无状态HTTP下用header维护会话）
 interface Session { id: string; server: Server; createdAt: Date; lastActivity: Date }
@@ -17,14 +20,17 @@ const sessions = new Map<string, Session>();
 
 function createMCPServer(): Server {
   const server = new Server(
-    { name: "FinanceMCP-DCTHS", version: "1.0.0" }, 
+    { name: "FinanceMCP-DCTHS", version: "1.0.3" }, 
     { capabilities: { tools: {} } }
   );
 
   const tools: Tool[] = [
-    { name: moneyflow.name, description: moneyflow.description, inputSchema: moneyflow.parameters as any },
-    { name: blockMoneyflow.name, description: blockMoneyflow.description, inputSchema: blockMoneyflow.parameters as any },
-    { name: blockMember.name, description: blockMember.description, inputSchema: blockMember.parameters as any }
+    { name: thsIndex.name, description: thsIndex.description, inputSchema: thsIndex.parameters as any },
+    { name: thsDaily.name, description: thsDaily.description, inputSchema: thsDaily.parameters as any },
+    { name: thsMember.name, description: thsMember.description, inputSchema: thsMember.parameters as any },
+    { name: dcIndex.name, description: dcIndex.description, inputSchema: dcIndex.parameters as any },
+    { name: dcMember.name, description: dcMember.description, inputSchema: dcMember.parameters as any },
+    { name: dcDaily.name, description: dcDaily.description, inputSchema: dcDaily.parameters as any }
   ];
 
   server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools }));
@@ -36,12 +42,18 @@ function createMCPServer(): Server {
     const token = process.env.TUSHARE_TOKEN;
     
     switch (name) {
-      case "get_stock_moneyflow": 
-        return await moneyflow.run(args, token);
-      case "get_block_moneyflow": 
-        return await blockMoneyflow.run(args, token);
-      case "get_block_member": 
-        return await blockMember.run(args, token);
+      case "get_ths_index": 
+        return await thsIndex.run(args || {}, token);
+      case "get_ths_daily": 
+        return await thsDaily.run(args || {}, token);
+      case "get_ths_member": 
+        return await thsMember.run(args || {}, token);
+      case "get_dc_index": 
+        return await dcIndex.run(args || {}, token);
+      case "get_dc_member": 
+        return await dcMember.run(args || {}, token);
+      case "get_dc_daily": 
+        return await dcDaily.run(args || {}, token);
       default: 
         throw new Error(`Unknown tool: ${name}`);
     }
@@ -93,7 +105,7 @@ app.get("/health", (_req: Request, res: Response) => {
     transport: "streamable-http", 
     activeSessions: sessions.size,
     server: "FinanceMCP-DCTHS",
-    version: "1.0.0"
+    version: "1.0.3"
   });
 });
 
@@ -134,7 +146,7 @@ app.all("/mcp", async (req: Request, res: Response) => {
         result: { 
           protocolVersion: "2024-11-05", 
           capabilities: { tools: {} }, 
-          serverInfo: { name: "FinanceMCP-DCTHS", version: "1.0.0" } 
+          serverInfo: { name: "FinanceMCP-DCTHS", version: "1.0.2" } 
         }, 
         id: body.id 
       });
@@ -142,9 +154,12 @@ app.all("/mcp", async (req: Request, res: Response) => {
     
     if (body.method === "tools/list") {
       const tools = [
-        { name: moneyflow.name, description: moneyflow.description, inputSchema: moneyflow.parameters },
-        { name: blockMoneyflow.name, description: blockMoneyflow.description, inputSchema: blockMoneyflow.parameters },
-        { name: blockMember.name, description: blockMember.description, inputSchema: blockMember.parameters }
+        { name: thsIndex.name, description: thsIndex.description, inputSchema: thsIndex.parameters },
+        { name: thsDaily.name, description: thsDaily.description, inputSchema: thsDaily.parameters },
+        { name: thsMember.name, description: thsMember.description, inputSchema: thsMember.parameters },
+        { name: dcIndex.name, description: dcIndex.description, inputSchema: dcIndex.parameters },
+        { name: dcMember.name, description: dcMember.description, inputSchema: dcMember.parameters },
+        { name: dcDaily.name, description: dcDaily.description, inputSchema: dcDaily.parameters }
       ];
       return res.json({ jsonrpc: "2.0", result: { tools }, id: body.id });
     }
@@ -157,14 +172,23 @@ app.all("/mcp", async (req: Request, res: Response) => {
       
       let result: any;
       switch (name) {
-        case "get_stock_moneyflow": 
-          result = await moneyflow.run(args, token); 
+        case "get_ths_index": 
+          result = await thsIndex.run(args || {}, token); 
           break;
-        case "get_block_moneyflow": 
-          result = await blockMoneyflow.run(args, token); 
+        case "get_ths_daily": 
+          result = await thsDaily.run(args || {}, token); 
           break;
-        case "get_block_member": 
-          result = await blockMember.run(args, token); 
+        case "get_ths_member": 
+          result = await thsMember.run(args || {}, token); 
+          break;
+        case "get_dc_index": 
+          result = await dcIndex.run(args || {}, token); 
+          break;
+        case "get_dc_member": 
+          result = await dcMember.run(args || {}, token); 
+          break;
+        case "get_dc_daily": 
+          result = await dcDaily.run(args || {}, token); 
           break;
         default: 
           throw new Error(`Unknown tool: ${name}`);
@@ -185,4 +209,3 @@ app.listen(PORT, () => {
   console.log(`💚 Health check: http://localhost:${PORT}/health`);
   console.log(`🔑 Tushare Token: ${process.env.TUSHARE_TOKEN ? '已配置' : '未配置（将从请求头读取）'}`);
 });
-

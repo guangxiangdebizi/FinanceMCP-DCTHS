@@ -7,15 +7,18 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 
 // 引入业务工具
-import { moneyflow } from "./tools/moneyflow.js";
-import { blockMoneyflow } from "./tools/blockMoneyflow.js";
-import { blockMember } from "./tools/blockMember.js";
+import { thsIndex } from "./tools/thsIndex.js";
+import { thsDaily } from "./tools/thsDaily.js";
+import { thsMember } from "./tools/thsMember.js";
+import { dcIndex } from "./tools/dcIndex.js";
+import { dcMember } from "./tools/dcMember.js";
+import { dcDaily } from "./tools/dcDaily.js";
 
 // 创建 MCP server
 const server = new Server(
   {
     name: "FinanceMCP-DCTHS",
-    version: "1.0.0",
+    version: "1.0.3",
   },
   {
     capabilities: {
@@ -29,19 +32,34 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
       {
-        name: moneyflow.name,
-        description: moneyflow.description,
-        inputSchema: moneyflow.parameters
+        name: thsIndex.name,
+        description: thsIndex.description,
+        inputSchema: thsIndex.parameters
       },
       {
-        name: blockMoneyflow.name,
-        description: blockMoneyflow.description,
-        inputSchema: blockMoneyflow.parameters
+        name: thsDaily.name,
+        description: thsDaily.description,
+        inputSchema: thsDaily.parameters
       },
       {
-        name: blockMember.name,
-        description: blockMember.description,
-        inputSchema: blockMember.parameters
+        name: thsMember.name,
+        description: thsMember.description,
+        inputSchema: thsMember.parameters
+      },
+      {
+        name: dcIndex.name,
+        description: dcIndex.description,
+        inputSchema: dcIndex.parameters
+      },
+      {
+        name: dcMember.name,
+        description: dcMember.description,
+        inputSchema: dcMember.parameters
+      },
+      {
+        name: dcDaily.name,
+        description: dcDaily.description,
+        inputSchema: dcDaily.parameters
       }
     ]
   };
@@ -55,33 +73,23 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const token = process.env.TUSHARE_TOKEN;
   
   switch (name) {
-    case "get_stock_moneyflow": {
-      return await moneyflow.run({
-        ts_code: args?.ts_code ? String(args.ts_code) : undefined,
-        trade_date: args?.trade_date ? String(args.trade_date) : undefined,
-        start_date: args?.start_date ? String(args.start_date) : undefined,
-        end_date: args?.end_date ? String(args.end_date) : undefined,
-        data_source: String(args?.data_source) as "dongcai" | "tonghuashun"
-      }, token);
-    }
+    case "get_ths_index":
+      return await thsIndex.run(args || {}, token);
 
-    case "get_block_moneyflow": {
-      return await blockMoneyflow.run({
-        block_code: args?.block_code ? String(args.block_code) : undefined,
-        trade_date: args?.trade_date ? String(args.trade_date) : undefined,
-        start_date: args?.start_date ? String(args.start_date) : undefined,
-        end_date: args?.end_date ? String(args.end_date) : undefined,
-        data_source: String(args?.data_source) as "dongcai" | "tonghuashun"
-      }, token);
-    }
+    case "get_ths_daily":
+      return await thsDaily.run(args || {}, token);
 
-    case "get_block_member": {
-      return await blockMember.run({
-        ts_code: args?.ts_code ? String(args.ts_code) : undefined,
-        block_code: args?.block_code ? String(args.block_code) : undefined,
-        data_source: String(args?.data_source) as "dongcai" | "tonghuashun"
-      }, token);
-    }
+    case "get_ths_member":
+      return await thsMember.run(args || {}, token);
+
+    case "get_dc_index":
+      return await dcIndex.run(args || {}, token);
+
+    case "get_dc_member":
+      return await dcMember.run(args || {}, token);
+
+    case "get_dc_daily":
+      return await dcDaily.run(args || {}, token);
 
     default:
       throw new Error(`Unknown tool: ${name}`);
@@ -99,4 +107,3 @@ main().catch((error) => {
   console.error("Server error:", error);
   process.exit(1);
 });
-

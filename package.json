@@ -1,7 +1,7 @@
 {
   "name": "financemcp-dcths",
-  "version": "1.0.0",
-  "description": "MCP Server for Financial Data - Supports DongCai and TongHuaShun data sources via Tushare API",
+  "version": "1.0.3",
+  "description": "MCP Server for Chinese Stock Market Sector Analysis - Supports TongHuaShun (THS) and DongCai (DC) sector data via Tushare API",
   "type": "module",
   "bin": {
     "financemcp-dcths": "./build/index.js",
@@ -23,9 +23,14 @@
     "finance",
     "tushare",
     "stock",
-    "moneyflow",
+    "sector",
     "dongcai",
-    "tonghuashun"
+    "tonghuashun",
+    "eastmoney",
+    "ths",
+    "dc",
+    "concept",
+    "industry"
   ],
   "author": "Xingyu Chen <guangxiangdebizi@gmail.com>",
   "license": "Apache-2.0",

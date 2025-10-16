@@ -8,22 +8,35 @@
 
 ## 📋 功能特性
 
-### 🎯 三大核心工具
+### 🎯 六大板块分析工具
 
-1. **个股资金流向** (`get_stock_moneyflow`)
-   - 支持东财（DongCai）数据源
-   - 支持同花顺（TongHuaShun）数据源
-   - 可按股票代码、日期查询
+#### 同花顺（THS）数据源
 
-2. **板块资金流向** (`get_block_moneyflow`)
-   - 支持东财（DongCai）数据源
-   - 支持同花顺（TongHuaShun）数据源
-   - 可按板块代码、日期查询
+1. **同花顺板块指数列表** (`get_ths_index`)
+   - 获取同花顺概念和行业指数列表
+   - 支持按指数代码、市场类型、指数类型查询
 
-3. **板块成分** (`get_block_member`)
-   - 支持东财（DongCai）数据源
-   - 支持同花顺（TongHuaShun）数据源
-   - 可查询板块成分股或股票所属板块
+2. **同花顺板块行情** (`get_ths_daily`)
+   - 获取同花顺板块指数行情数据
+   - 包含开盘价、收盘价、涨跌幅、成交量等
+
+3. **同花顺板块成分** (`get_ths_member`)
+   - 获取同花顺概念板块成分股
+   - 可查询板块包含的股票或股票所属板块
+
+#### 东方财富（DC）数据源
+
+4. **东财板块信息** (`get_dc_index`)
+   - 获取东财概念板块每日数据
+   - 包含领涨股、总市值、涨跌幅等信息
+
+5. **东财板块成分** (`get_dc_member`)
+   - 获取东财板块成分股数据
+   - 支持历史成分查询
+
+6. **东财板块行情** (`get_dc_daily`)
+   - 获取东财板块行情数据
+   - 支持概念板块、行业板块、地域板块
 
 ### 🔧 两种部署模式
 
@@ -146,94 +159,135 @@ npm run start:http
 
 ## 💡 使用示例
 
-### 示例 1：查询平安银行资金流向（东财数据）
+### 示例 1：查询同花顺概念板块列表
 
 在 Claude 中输入：
 ```
-使用东财数据源，查询平安银行（000001.SZ）2023年12月1日的资金流向
+查询所有同花顺概念指数
 ```
 
 对应的 MCP 调用：
 ```json
 {
-  "name": "get_stock_moneyflow",
+  "name": "get_ths_index",
   "arguments": {
-    "ts_code": "000001.SZ",
-    "trade_date": "20231201",
-    "data_source": "dongcai"
+    "type": "N"
   }
 }
 ```
 
-### 示例 2：查询板块资金流向（同花顺数据）
+### 示例 2：查询东财板块今日数据
 
 在 Claude 中输入：
 ```
-使用同花顺数据源，查询2023年12月所有板块的资金流向
+查询东财人形机器人板块今天的数据
 ```
 
 对应的 MCP 调用：
 ```json
 {
-  "name": "get_block_moneyflow",
+  "name": "get_dc_index",
   "arguments": {
+    "name": "人形机器人",
+    "trade_date": "20231201"
+  }
+}
+```
+
+### 示例 3：查询同花顺板块行情
+
+在 Claude 中输入：
+```
+查询同花顺人工智能板块最近一周的行情
+```
+
+对应的 MCP 调用：
+```json
+{
+  "name": "get_ths_daily",
+  "arguments": {
+    "ts_code": "885823.TI",
     "start_date": "20231201",
-    "end_date": "20231231",
-    "data_source": "tonghuashun"
+    "end_date": "20231207"
   }
 }
 ```
 
-### 示例 3：查询板块成分股
+### 示例 4：查询板块成分股
 
 在 Claude 中输入：
 ```
-使用东财数据源，查询 BK0001 板块包含哪些股票
+查询东财新能源汽车板块包含哪些股票
 ```
 
 对应的 MCP 调用：
 ```json
 {
-  "name": "get_block_member",
+  "name": "get_dc_member",
   "arguments": {
-    "block_code": "BK0001",
-    "data_source": "dongcai"
+    "ts_code": "BK0001.DC",
+    "trade_date": "20231201"
   }
 }
 ```
 
 ## 📚 API 参数说明
 
-### 通用参数
+### 🔵 同花顺工具参数
+
+#### get_ths_index - 板块指数列表
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| `data_source` | string | ✅ | 数据源：`dongcai`（东财）或 `tonghuashun`（同花顺） |
+| `ts_code` | string | ❌ | 指数代码（如 885823.TI） |
+| `exchange` | string | ❌ | 市场类型：A-A股 HK-港股 US-美股 |
+| `type` | string | ❌ | 指数类型：N-概念指数 I-行业指数 R-地域指数 等 |
 
-### 个股资金流向参数
+#### get_ths_daily - 板块行情
 
-| 参数 | 类型 | 必填 | 说明 | 示例 |
-|------|------|------|------|------|
-| `ts_code` | string | ❌ | 股票代码 | `000001.SZ`、`600000.SH` |
-| `trade_date` | string | ❌ | 交易日期 | `20231201` |
-| `start_date` | string | ❌ | 开始日期 | `20231201` |
-| `end_date` | string | ❌ | 结束日期 | `20231231` |
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `ts_code` | string | ❌ | 指数代码（如 885823.TI） |
+| `trade_date` | string | ❌ | 交易日期（YYYYMMDD） |
+| `start_date` | string | ❌ | 开始日期 |
+| `end_date` | string | ❌ | 结束日期 |
 
-### 板块资金流向参数
+#### get_ths_member - 板块成分
 
-| 参数 | 类型 | 必填 | 说明 | 示例 |
-|------|------|------|------|------|
-| `block_code` | string | ❌ | 板块代码 | `BK0001` |
-| `trade_date` | string | ❌ | 交易日期 | `20231201` |
-| `start_date` | string | ❌ | 开始日期 | `20231201` |
-| `end_date` | string | ❌ | 结束日期 | `20231231` |
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `ts_code` | string | ❌ | 板块指数代码（查询该板块的成分股） |
+| `con_code` | string | ❌ | 股票代码（查询该股票所属板块） |
 
-### 板块成分参数
+### 🟢 东方财富工具参数
 
-| 参数 | 类型 | 必填 | 说明 | 示例 |
-|------|------|------|------|------|
-| `ts_code` | string | ❌ | 股票代码（查询该股票所属板块） | `000001.SZ` |
-| `block_code` | string | ❌ | 板块代码（查询该板块的成分股） | `BK0001` |
+#### get_dc_index - 板块信息
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `ts_code` | string | ❌ | 指数代码（支持多个，逗号分隔） |
+| `name` | string | ❌ | 板块名称（如：人形机器人） |
+| `trade_date` | string | ❌ | 交易日期（YYYYMMDD） |
+| `start_date` | string | ❌ | 开始日期 |
+| `end_date` | string | ❌ | 结束日期 |
+
+#### get_dc_member - 板块成分
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `ts_code` | string | ❌ | 板块指数代码 |
+| `con_code` | string | ❌ | 成分股票代码 |
+| `trade_date` | string | ❌ | 交易日期（支持历史查询） |
+
+#### get_dc_daily - 板块行情
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `ts_code` | string | ❌ | 板块代码（格式：xxxxx.DC） |
+| `trade_date` | string | ❌ | 交易日期（YYYYMMDD） |
+| `start_date` | string | ❌ | 开始日期 |
+| `end_date` | string | ❌ | 结束日期 |
+| `idx_type` | string | ❌ | 板块类型：概念板块、行业板块、地域板块 |
 
 ## 🔐 Token 安全建议
 
@@ -253,9 +307,12 @@ src/
 ├── utils/
 │   └── tushareClient.ts  # Tushare API 客户端
 └── tools/
-    ├── moneyflow.ts      # 个股资金流向工具
-    ├── blockMoneyflow.ts # 板块资金流向工具
-    └── blockMember.ts    # 板块成分工具
+    ├── thsIndex.ts       # 同花顺板块指数列表
+    ├── thsDaily.ts       # 同花顺板块行情
+    ├── thsMember.ts      # 同花顺板块成分
+    ├── dcIndex.ts        # 东财板块信息
+    ├── dcMember.ts       # 东财板块成分
+    └── dcDaily.ts        # 东财板块行情
 ```
 
 ### 开发模式
@@ -273,6 +330,16 @@ npm run dev
 1. 在 `src/tools/` 目录下创建新工具文件
 2. 实现工具接口（name, description, parameters, run）
 3. 在 `src/index.ts` 和 `src/httpServer.ts` 中导入并注册工具
+
+### 工具权限要求
+
+所有工具均需要 **5000-6000 积分**的 Tushare 账号权限。具体权限要求：
+- `get_ths_index`: 需要 6000 积分
+- `get_ths_daily`: 需要 6000 积分
+- `get_ths_member`: 需要 5000 积分
+- `get_dc_index`: 需要 6000 积分
+- `get_dc_member`: 需要 6000 积分
+- `get_dc_daily`: 需要 6000 积分
 
 ## 🐛 常见问题
 
@@ -313,8 +380,17 @@ Apache-2.0 License - 详见 [LICENSE](./LICENSE) 文件
 ## 🙏 致谢
 
 - [Model Context Protocol](https://modelcontextprotocol.io/) - MCP SDK
-- [Tushare](https://tushare.pro/) - 金融数据 API
-- 东方财富、同花顺 - 数据来源
+- [Tushare Pro](https://tushare.pro/) - 金融数据 API
+- [东方财富](https://www.eastmoney.com/) - 数据来源（概念板块、行业板块数据）
+- [同花顺](https://www.10jqka.com.cn/) - 数据来源（概念指数、板块行情数据）
+
+## ⚠️ 数据版权声明
+
+本项目使用的板块数据来源于：
+- **同花顺（THS）数据**：数据版权归属同花顺。如需商业用途，请联系同花顺获取授权。
+- **东方财富（DC）数据**：数据版权归属东方财富。如需商业用途，请联系东方财富获取授权。
+
+本工具仅供个人学习和研究使用。
 
 ## 📮 反馈与贡献
 
